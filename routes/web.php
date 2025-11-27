@@ -18,7 +18,7 @@ use App\Http\Controllers\ContactController;
 Route::get('/', [ContactController::class, 'index'])->name('contacts.index');
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'throttle:60,1'])->group(function () {
 
     // CONTACTS
     Route::get('/contacts/create', [ContactController::class, 'create'])->name('contacts.create');
@@ -30,11 +30,14 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/contacts/{contact}', [ContactController::class, 'destroy'])->name('contacts.destroy');
     Route::delete('/contacts/{contact}/wipe', [ContactController::class, 'wipe'])->name('contacts.wipe');
-    Route::patch('/contacts/{contact}/restore', [ContactController::class, 'restore'])->name('contacts.restore');
+
+    Route::get('/trashed', [ContactController::class, 'trashed'])->name('contacts.trashed');
+    Route::patch('/restore/{contact}', [ContactController::class, 'restore'])->name('contacts.restore');
 
     // PROFILE
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
 });
 require __DIR__ . '/auth.php';

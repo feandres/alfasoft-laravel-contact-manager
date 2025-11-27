@@ -8,6 +8,7 @@ use App\Http\Requests\StoreContactRequest;
 use App\Http\Requests\UpdateContactRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\RestoreContactRequest;
 
 class ContactController extends Controller
 {
@@ -38,10 +39,15 @@ class ContactController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Contact $contact)
+    public function show(Contact $contact, Request $request)
     {
-        return view('contacts.show', compact('contact'));
+
+        $page = $request->query('page');
+        $search = $request->query('search');
+
+        return view('contacts.show', compact('contact', 'page', 'search'));
     }
+
 
 
     /**
@@ -120,15 +126,15 @@ class ContactController extends Controller
         }
     }
 
+
     /**
      * Restore a soft-deleted contact.
      */
-    public function restore(int $id): RedirectResponse
+    public function restore(RestoreContactRequest $request, int $contact): RedirectResponse
     {
-        $contact = Contact::withTrashed()->findOrFail($id);
+        $contact = Contact::withTrashed()->findOrFail($contact);
 
         DB::beginTransaction();
-
         try {
             $contact->restore();
             DB::commit();
@@ -137,10 +143,30 @@ class ContactController extends Controller
                 ->with('success', 'Contact restored successfully.');
         } catch (\Throwable $e) {
             DB::rollBack();
-            return redirect()->route('contacts.index')
+            return redirect()->route('contacts.trashed')
                 ->with('error', 'Failed to restore contact.');
         }
     }
+
+    public function trashed(Request $request)
+    {
+        $search = $request->input('search');
+
+        $contacts = Contact::onlyTrashed()
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('contact', 'like', "%{$search}%");
+                });
+            })
+            ->orderByDesc('deleted_at')
+            ->paginate(10)
+            ->appends(['search' => $search]);
+
+        return view('contacts.trashed', compact('contacts'));
+    }
+
 
     /**
      * Permanently delete a contact (hard delete).
