@@ -17,23 +17,25 @@
 <body class="font-sans antialiased">
     <div class="min-h-screen bg-gray-100">
 
-        @include('layouts.navigation')
+        <div class="fixed top-0 w-full z-10 bg-white shadow">
+            @include('layouts.navigation')
+        </div>
 
         @if (isset($header))
-        <header class="bg-white shadow">
+        <header class="bg-white shadow pt-16"> 
             <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 {{ $header }}
             </div>
         </header>
         @endif
 
-        <main class="py-6">
+        <main class="pt-20 pb-16"> 
             {{ $slot ?? '' }}
 
             @yield('content')
         </main>
 
-        <footer class="bg-white border-t py-4 mt-10 text-center text-sm text-gray-600">
+        <footer class="fixed bottom-0 w-full bg-white border-t py-4 text-center text-sm text-gray-600 z-10">
             &copy; {{ date('Y') }} Contact Manager.
         </footer>
 
