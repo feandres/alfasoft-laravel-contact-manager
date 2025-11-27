@@ -1,6 +1,7 @@
-@extends('layout.layout')
+@extends('layouts.app')
 
-@section('title', 'Contact Details')
+@section('title', 'Contacts Manager - Details')
+
 
 @section('content')
 

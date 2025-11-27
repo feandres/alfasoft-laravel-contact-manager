@@ -1,4 +1,4 @@
-@extends('layout.layout')
+@extends('layouts.app')
 
 @section('title', 'Contacts Manager')
 
@@ -25,7 +25,9 @@
                     <th>Name</th>
                     <th>Email</th>
                     <th>Contact</th>
-                    <th>Actions</th>
+                    @auth
+                        <th>Actions</th>
+                    @endauth    
                 </tr>
             </thead>
             <tbody>
@@ -34,15 +36,11 @@
                     <td>{{ $contact->name }}</td>
                     <td>{{ $contact->email }}</td>
                     <td>{{ $contact->contact ?? '-' }}</td>
-                    <td class="actions">
-                        <a href="{{ route('contacts.show', $contact) }}" class="btn-show">Show</a>
-                        <a href="{{ route('contacts.edit', $contact) }}" class="btn-show">Edit</a>
-                        <form action="{{ route('contacts.destroy', $contact) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-show">Destroy</button>
-                        </form>
-                    </td>
+                    @auth
+                        <td class="actions">
+                            <a href="{{ route('contacts.show', $contact) }}" class="btn-show">Show</a>
+                        </td>
+                    @endauth
                 </tr>
                 @empty
                 <tr>

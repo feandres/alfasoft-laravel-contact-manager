@@ -99,6 +99,7 @@ class ContactController extends Controller
             throw $e;
         }
     }
+
     /**
      * Remove the specified resource from storage.
      */
