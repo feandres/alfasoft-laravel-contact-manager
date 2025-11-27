@@ -24,8 +24,14 @@
                     <td>{{ $contact->name }}</td>
                     <td>{{ $contact->email }}</td>
                     <td>{{ $contact->contact ?? '-' }}</td>
-                    <td>
+                    <td class="actions">
                         <a href="{{ route('contacts.show', $contact) }}" class="btn-show">Show</a>
+                        <a href="{{ route('contacts.edit', $contact) }}" class="btn-show">Edit</a>
+                        <form action="{{ route('contacts.destroy', $contact) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn-show">Destroy</button>
+                        </form>
                     </td>
                 </tr>
                 @empty
@@ -115,6 +121,16 @@
         font-size: 0.85rem;
     }
 
+    td.actions {
+        display: flex;
+        gap: 0.4rem;
+        align-items: center;
+    }
+
+    td.actions form {
+        margin: 0;
+    }
+
     .btn-show {
         display: inline-block;
         padding: 0.3rem 0.5rem;
@@ -123,10 +139,21 @@
         border-radius: 3px;
         text-decoration: none;
         color: #000;
+        background: #fff;
+        cursor: pointer;
     }
 
     .btn-show:hover {
         background: #f2f2f2;
+    }
+
+    /* Botão dentro do form */
+    .btn-show button {
+        all: unset;
+        cursor: pointer;
+        display: inline-block;
+        width: 100%;
+        text-align: center;
     }
 </style>
 @endsection
