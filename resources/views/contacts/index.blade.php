@@ -23,8 +23,8 @@
             <thead>
                 <tr>
                     <th class="table-header w-1/3">Name</th>
-                    <th class="table-header w-1/3 hidden sm:table-cell">Email</th>
-                    <th class="table-header w-1/6 hidden sm:table-cell">Contact</th>
+                    <th class="table-header w-1/3">Email</th>
+                    <th class="table-header w-1/6">Contact</th>
                     @auth
                         <th class="table-header w-1/6 text-center">Actions</th>
                     @endauth    
@@ -34,8 +34,8 @@
                 @forelse ($contacts as $contact)
                 <tr class="table-row">
                     <td class="table-cell font-medium">{{ $contact->name }}</td>
-                    <td class="table-cell hidden sm:table-cell text-sm text-gray-600">{{ $contact->email }}</td>
-                    <td class="table-cell hidden sm:table-cell text-sm text-gray-600">{{ $contact->contact ?? '-' }}</td>
+                    <td class="table-cell text-sm text-gray-600">{{ $contact->email }}</td>
+                    <td class="table-cell text-sm text-gray-600">{{ $contact->contact ?? '-' }}</td>
                     @auth
                         <td class="table-cell actions-cell">
                             <a href="{{ route('contacts.show', [
