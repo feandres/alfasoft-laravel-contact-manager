@@ -8,16 +8,16 @@
     <h1 class="title">Contacts</h1>
 
     <div class="header-actions">
-        <a href="{{ route('contacts.create') }}" class="btn-primary">Create New Contact</a>
-
         @auth
-            <form method="GET" action="{{ route('contacts.index') }}" id="search-form" class="search-form">
-                <input type="text" name="search" id="search-input"
-                    value="{{ request('search') }}"
-                    placeholder="Search by Name, Email or Contact"
-                    class="search-input">
-            </form>
+            <a href="{{ route('contacts.create') }}" class="btn-primary">Create New Contact</a>
         @endauth
+        
+        <form method="GET" action="{{ route('contacts.index') }}" id="search-form" class="search-form">
+            <input type="text" name="search" id="search-input"
+                value="{{ request('search') }}"
+                placeholder="Search by Name, Email or Contact"
+                class="search-input">
+        </form>
     </div>
 
     <div class="card table-card">
