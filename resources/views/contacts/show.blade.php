@@ -6,7 +6,21 @@
 
 <div class="container">
     <h1>Contact Details</h1>
+    <div class="actions-header" style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
+        <a href="{{ route('contacts.edit', $contact) }}" class="btn-edit">Edit</a>
 
+        <form action="{{ route('contacts.destroy', $contact) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this contact?')" style="display:inline;">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn-destroy">Destroy</button>
+        </form>
+
+        <form action="{{ route('contacts.wipe', $contact) }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this contact?')" style="display:inline;">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn-wipe">Wipe</button>
+        </form>
+    </div>
     <div class="details-card">
         <div class="details-row">
             <label>Name</label>
@@ -52,6 +66,86 @@
         font-size: 1.4rem;
         font-weight: bold;
         margin-bottom: 1.5rem;
+    }
+
+
+
+
+
+    .details-card {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 1rem;
+        background: #fafafa;
+    }
+
+    .details-row {
+        margin-bottom: 1rem;
+    }
+
+    .details-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .details-row label {
+        font-size: 0.9rem;
+        color: #555;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .details-value {
+        border: 1px solid #ddd;
+        padding: 0.5rem;
+        background: #fff;
+        border-radius: 3px;
+        font-size: 0.95rem;
+    }
+
+    .btn-edit {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+        border: 1px solid #333;
+        border-radius: 3px;
+        text-decoration: none;
+        color: #000;
+        background: #fff;
+        transition: background 0.2s ease;
+    }
+
+    .btn-edit:hover {
+        background: #f2f2f2;
+    }
+
+    .btn-destroy {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+        border: 1px solid #f0ad4e;
+        border-radius: 3px;
+        background: #fff3e0;
+        color: #e67e22;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .btn-destroy:hover {
+        background: #f8d9b5;
+    }
+
+    .btn-wipe {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+        border: 1px solid #d9534f;
+        border-radius: 3px;
+        background: #fbeaea;
+        color: #c0392b;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .btn-wipe:hover {
+        background: #f5c6c6;
     }
 
     .details-card {
