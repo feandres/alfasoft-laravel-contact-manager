@@ -2,7 +2,6 @@
 
 @section('title', 'Contacts Manager - Details')
 
-
 @section('content')
 
 <div class="container">
@@ -52,8 +51,11 @@
     </div>
 
     <div class="actions">
-        <a href="{{ route('contacts.index') }}" class="btn-back">Back</a>
+        <a href="{{ route('contacts.index', ['page' => $page, 'search' => $search]) }}"
+            class="btn-back">Back</a>
     </div>
+
+
 </div>
 
 <style>
@@ -68,10 +70,6 @@
         font-weight: bold;
         margin-bottom: 1.5rem;
     }
-
-
-
-
 
     .details-card {
         border: 1px solid #ddd;

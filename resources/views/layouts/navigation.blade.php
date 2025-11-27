@@ -12,6 +12,11 @@
                     <x-nav-link :href="route('contacts.index')" :active="request()->routeIs('contacts.index')">
                         Contacts
                     </x-nav-link>
+                    @auth
+                        <x-nav-link :href="route('contacts.trashed')" :active="request()->routeIs('contacts.trashed')">
+                            Soft Deleted Contacts
+                        </x-nav-link>
+                    @endauth
                 </div>
             </div>
 
@@ -76,6 +81,11 @@
             <x-responsive-nav-link :href="route('contacts.index')" :active="request()->routeIs('contacts.index')">
                 Contacts
             </x-responsive-nav-link>
+            @auth
+            <x-responsive-nav-link :href="route('contacts.trashed')" :active="request()->routeIs('contacts.trashed')">
+                Soft Deleted Contacts
+            </x-responsive-nav-link>
+            @endauth
         </div>
 
         @auth
@@ -108,7 +118,7 @@
         @guest
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="mt-3 flex flex-col gap-3">
-                <x-responsive-nav-link  :href="route('login')">
+                <x-responsive-nav-link :href="route('login')">
                     Login
                 </x-responsive-nav-link>
 

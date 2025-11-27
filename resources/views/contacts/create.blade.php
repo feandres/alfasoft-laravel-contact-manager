@@ -14,38 +14,44 @@
 
             <div class="form-row">
                 <label>Name</label>
-                <input 
-                    type="text" 
-                    name="name" 
+                <input
+                    type="text"
+                    name="name"
                     class="form-input"
                     value="{{ old('name') }}"
-                    minLength="5"
-                    required
-                >
+                    minlength="5"
+                    required>
+                @error('name')
+                <div class="text-error">{{ $message }}</div>
+                @enderror
             </div>
 
             <div class="form-row">
                 <label>Email</label>
-                <input 
-                    type="email" 
-                    name="email" 
+                <input
+                    type="email"
+                    name="email"
                     class="form-input"
                     value="{{ old('email') }}"
-                    required
-                >
+                    required>
+                @error('email')
+                <div class="text-error">{{ $message }}</div>
+                @enderror
             </div>
 
             <div class="form-row">
                 <label>Contact</label>
-                <input 
-                    type="text" 
-                    name="contact" 
+                <input
+                    type="text"
+                    name="contact"
                     class="form-input"
                     value="{{ old('contact') }}"
                     pattern="\d{9}"
-                    minLength="9"
-                    maxLength="9"
-                >
+                    minlength="9"
+                    maxlength="9">
+                @error('contact')
+                <div class="text-error">{{ $message }}</div>
+                @enderror
             </div>
         </div>
 
@@ -133,6 +139,12 @@
 
     .btn-save:hover {
         background: #f2f2f2;
+    }
+
+    .text-error {
+        color: red;
+        font-size: 0.8rem;
+        margin-top: 0.2rem;
     }
 </style>
 
