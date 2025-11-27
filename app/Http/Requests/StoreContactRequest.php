@@ -24,17 +24,17 @@ class StoreContactRequest extends FormRequest
     public function messages(): array
     {
         return [
-            // 'name.required' => 'The name field is required.',
-            // 'name.string' => 'The name must be a string.',
-            // 'name.min' => 'The name must be at least 5 characters.',
+            'name.required' => 'The name field is required.',
+            'name.string' => 'The name must be a string.',
+            'name.min' => 'The name must be at least 5 characters.',
 
-            // 'contact.required' => 'The contact field is required.',
-            // 'contact.digits' => 'The contact must be exactly 9 digits.',
-            // 'contact.unique' => 'The contact has already been taken.',
+            'contact.required' => 'The contact field is required.',
+            'contact.digits' => 'The contact must be exactly 9 digits.',
+            'contact.unique' => 'The contact has already been taken.',
 
-            // 'email.required' => 'The email field is required.',
-            // 'email.email' => 'The email must be a valid email address.',
-            // 'email.unique' => 'The email has already been taken.',
+            'email.required' => 'The email field is required.',
+            'email.email' => 'The email must be a valid email address.',
+            'email.unique' => 'The email has already been taken.',
         ];
     }
 }
