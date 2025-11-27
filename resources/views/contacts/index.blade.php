@@ -10,12 +10,14 @@
     <div class="header-actions">
         <a href="{{ route('contacts.create') }}" class="btn-primary">Create New Contact</a>
 
-        <form method="GET" action="{{ route('contacts.index') }}" id="search-form" class="search-form">
-            <input type="text" name="search" id="search-input"
-                value="{{ request('search') }}"
-                placeholder="Search by Name, Email or Contact"
-                class="search-input">
-        </form>
+        @auth
+            <form method="GET" action="{{ route('contacts.index') }}" id="search-form" class="search-form">
+                <input type="text" name="search" id="search-input"
+                    value="{{ request('search') }}"
+                    placeholder="Search by Name, Email or Contact"
+                    class="search-input">
+            </form>
+        @endauth
     </div>
 
     <div class="card table-card">
