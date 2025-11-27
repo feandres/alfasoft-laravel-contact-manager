@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Contact;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
+use App\Http\Requests\StoreContactRequest;
 
 class ContactController extends Controller
 {
@@ -20,30 +21,42 @@ class ContactController extends Controller
         ]);
     }
 
-    
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     /**
      * Display the specified resource.
      */
     public function show(Contact $contact)
     {
-        //
+        return view('contacts.show', compact('contact'));
     }
+
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('contacts.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreContactRequest $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $contact = Contact::create($request->validated());
+
+            DB::commit();
+
+            return redirect()->route('contacts.show', $contact);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e; 
+        }
+    }
+
 
     /**
      * Show the form for editing the specified resource.
