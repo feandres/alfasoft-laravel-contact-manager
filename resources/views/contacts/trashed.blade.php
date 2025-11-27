@@ -33,6 +33,7 @@
                 <tr>
                     <th class="table-header w-1/4">Name</th>
                     <th class="table-header w-1/4 hidden sm:table-cell">Email</th>
+                    <th class="table-header w-1/4 hidden sm:table-cell">Contact</th>
                     <th class="table-header w-1/4 hidden sm:table-cell">Deleted Date</th>
                     <th class="table-header w-1/4 text-center">Actions</th>
                 </tr>
@@ -42,6 +43,7 @@
                 <tr class="table-row">
                     <td class="table-cell font-medium">{{ $contact->name }}</td>
                     <td class="table-cell hidden sm:table-cell text-sm text-gray-600">{{ $contact->email }}</td>
+                    <td class="table-cell hidden sm:table-cell text-sm text-gray-600">{{ $contact->contact }}</td>
                     <td class="table-cell hidden sm:table-cell text-sm text-gray-600">
                         {{ \Carbon\Carbon::parse($contact->deleted_at)->format('d/m/Y H:i') }}
                     </td>
