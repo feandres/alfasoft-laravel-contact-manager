@@ -4,196 +4,213 @@
 
 @section('content')
 
-<div class="container">
-    <h1>Contact Details</h1>
-    <div class="actions-header" style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
-        <a href="{{ route('contacts.edit', $contact) }}" class="btn-edit">Edit</a>
+<div class="minimal-container">
+    <h1 class="title">Contact Details</h1>
 
-        <form action="{{ route('contacts.destroy', $contact) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this contact?')" style="display:inline;">
+    <div class="actions-header mb-6">
+        <a href="{{ route('contacts.edit', $contact) }}" class="btn-primary-small">Edit</a>
+
+        <form action="{{ route('contacts.destroy', $contact) }}" method="POST" class="inline-form">
             @csrf
             @method('DELETE')
-            <button type="submit" class="btn-destroy">Destroy</button>
+            <button type="submit" class="btn-warning-small">Destroy</button>
         </form>
 
-        <form action="{{ route('contacts.wipe', $contact) }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this contact?')" style="display:inline;">
+        <form action="{{ route('contacts.wipe', $contact) }}" method="POST" class="inline-form">
             @csrf
             @method('DELETE')
-            <button type="submit" class="btn-wipe">Wipe</button>
+            <button type="submit" class="btn-danger-small">Wipe</button>
         </form>
     </div>
-    <div class="details-card">
-        <div class="details-row">
-            <label>Name</label>
-            <div class="details-value">{{ $contact->name }}</div>
+
+    <div class="card">
+        <div class="detail-row">
+            <label class="detail-label">Name</label>
+            <div class="detail-value">{{ $contact->name }}</div>
         </div>
 
-        <div class="details-row">
-            <label>Email</label>
-            <div class="details-value">{{ $contact->email }}</div>
+        <div class="detail-row">
+            <label class="detail-label">Email</label>
+            <div class="detail-value">{{ $contact->email }}</div>
         </div>
 
-        <div class="details-row">
-            <label>Contact</label>
-            <div class="details-value">{{ $contact->contact ?? '-' }}</div>
+        <div class="detail-row">
+            <label class="detail-label">Contact</label>
+            <div class="detail-value">{{ $contact->contact ?? '-' }}</div>
+        </div>
+        
+        <hr class="divider">
+
+        <div class="detail-row">
+            <label class="detail-label">Created At</label>
+            <div class="detail-value-meta">{{ \Carbon\Carbon::parse($contact->created_at)->format('d/m/Y - H:i') }}</div>
         </div>
 
-        <div class="details-row">
-            <label>Created At</label>
-            <div class="details-value">{{ \Carbon\Carbon::parse($contact->created_at)->format('d/m/Y - m:i') }}</div>
+        <div class="detail-row">
+            <label class="detail-label">Updated At</label>
+            <div class="detail-value-meta">{{ \Carbon\Carbon::parse($contact->updated_at)->format('d/m/Y - H:i') ?? '-' }}</div>
         </div>
-
-        <div class="details-row">
-            <label>Updated At</label>
-            <div class="details-value">{{ \Carbon\Carbon::parse($contact->updated_at)->format('d/m/Y - m:i') ?? '-' }}</div>
+        
+        @if ($contact->deleted_at)
+        <div class="detail-row mt-4">
+            <label class="detail-label text-danger">Deleted At</label>
+            <div class="detail-value-meta text-danger">{{ \Carbon\Carbon::parse($contact->deleted_at)->format('d/m/Y - H:i') }}</div>
         </div>
-
-
+        @endif
     </div>
 
-    <div class="actions">
-        <a href="{{ route('contacts.index', ['page' => $page, 'search' => $search]) }}"
-            class="btn-back">Back</a>
+    <div class="actions mt-6 justify-start">
+        <a href="{{ route('contacts.index') }}" class="btn-secondary">Back to List</a>
     </div>
-
 
 </div>
 
 <style>
-    .container {
-        max-width: 600px;
+    .minimal-container {
+        max-width: 550px;
         margin: 0 auto;
-        padding: 1rem;
+        padding: 1.5rem;
     }
 
-    h1 {
-        font-size: 1.4rem;
-        font-weight: bold;
+    .title {
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: #333;
         margin-bottom: 1.5rem;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 0.5rem;
     }
 
-    .details-card {
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 1rem;
-        background: #fafafa;
+    .card {
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 1.5rem;
+        background: #ffffff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    
+    .divider {
+        border: 0;
+        border-top: 1px solid #f0f0f0;
+        margin: 1.5rem 0;
     }
 
-    .details-row {
+    .detail-row {
         margin-bottom: 1rem;
     }
-
-    .details-row:last-child {
+    
+    .detail-row:last-of-type {
         margin-bottom: 0;
     }
 
-    .details-row label {
-        font-size: 0.9rem;
-        color: #555;
+    .detail-label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #777;
         display: block;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.2rem;
+        text-transform: uppercase;
     }
 
-    .details-value {
-        border: 1px solid #ddd;
-        padding: 0.5rem;
-        background: #fff;
-        border-radius: 3px;
-        font-size: 0.95rem;
+    .detail-value {
+        font-size: 1.05rem;
+        font-weight: 400;
+        color: #333;
+        background: #f8f8f8; 
+        padding: 0.6rem 0.75rem;
+        border-radius: 4px;
+        border: 1px solid #eee;
+    }
+    
+    .detail-value-meta {
+        font-size: 0.9rem;
+        color: #777;
+        padding: 0.2rem 0;
     }
 
-    .btn-edit {
+    .actions-header {
+        display: flex;
+        gap: 0.75rem;
+    }
+    
+    .inline-form {
         display: inline-block;
-        padding: 0.4rem 0.8rem;
-        font-size: 0.85rem;
-        border: 1px solid #333;
-        border-radius: 3px;
-        text-decoration: none;
-        color: #000;
-        background: #fff;
-        transition: background 0.2s ease;
-    }
-
-    .btn-edit:hover {
-        background: #f2f2f2;
-    }
-
-    .btn-destroy {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.85rem;
-        border: 1px solid #f0ad4e;
-        border-radius: 3px;
-        background: #fff3e0;
-        color: #e67e22;
-        cursor: pointer;
-        transition: background 0.2s ease;
-    }
-
-    .btn-destroy:hover {
-        background: #f8d9b5;
-    }
-
-    .btn-wipe {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.85rem;
-        border: 1px solid #d9534f;
-        border-radius: 3px;
-        background: #fbeaea;
-        color: #c0392b;
-        cursor: pointer;
-        transition: background 0.2s ease;
-    }
-
-    .btn-wipe:hover {
-        background: #f5c6c6;
-    }
-
-    .details-card {
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 1rem;
-        background: #fafafa;
-    }
-
-    .details-row {
-        margin-bottom: 1rem;
-    }
-
-    .details-row:last-child {
-        margin-bottom: 0;
-    }
-
-    .details-row label {
-        font-size: 0.9rem;
-        color: #555;
-        display: block;
-        margin-bottom: 0.25rem;
-    }
-
-    .details-value {
-        border: 1px solid #ddd;
-        padding: 0.5rem;
-        background: #fff;
-        border-radius: 3px;
-        font-size: 0.95rem;
     }
 
     .actions {
         margin-top: 1.5rem;
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-start;
     }
 
-    .btn-back {
-        display: inline-block;
-        padding: 0.5rem 0.9rem;
-        border: 1px solid #aaa;
-        background: #fff;
+    .btn-primary-small,
+    .btn-warning-small,
+    .btn-danger-small {
+        padding: 0.4rem 0.9rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
         text-decoration: none;
-        border-radius: 3px;
-        font-size: 0.9rem;
-        color: #333;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
     }
 
-    .btn-back:hover {
-        background: #f2f2f2;
+    .btn-primary-small {
+        border: 1px solid #3b82f6; 
+        background: #3b82f6; 
+        color: #fff;
+    }
+    .btn-primary-small:hover {
+        background: #2563eb;
+        border-color: #2563eb;
+    }
+
+    .btn-warning-small {
+        border: 1px solid #f59e0b;
+        background: #f59e0b; 
+        color: #fff;
+    }
+    .btn-warning-small:hover {
+        background: #d97706;
+        border-color: #d97706;
+    }
+    
+    .btn-danger-small {
+        border: 1px solid #ef4444; 
+        background: #ef4444; 
+        color: #fff;
+    }
+    .btn-danger-small:hover {
+        background: #dc2626;
+        border-color: #dc2626;
+    }
+
+    .btn-secondary {
+        padding: 0.6rem 1.2rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+        border: 1px solid #ccc;
+        background: #f9f9f9;
+        color: #555;
+    }
+
+    .btn-secondary:hover {
+        background: #efefef;
+    }
+    
+    .text-danger {
+        color: #ef4444;
     }
 </style>
 

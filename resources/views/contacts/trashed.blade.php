@@ -3,69 +3,73 @@
 @section('title', 'Contacts Manager - Deleted List')
 
 @section('content')
-<div class="container">
-    <h1>Soft Deleted Contacts</h1>
+<div class="minimal-container">
+    <h1 class="title">Soft Deleted Contacts</h1>
 
-    <form method="GET" action="{{ route('contacts.trashed') }}" id="search-form">
-        <input type="text" name="search" id="search-input"
-            value="{{ request('search') }}"
-            placeholder="Search..."
-            class="search-input">
-    </form>
+    <div class="header-actions-trashed">
+        <form method="GET" action="{{ route('contacts.trashed') }}" id="search-form" class="search-form">
+            <input type="text" name="search" id="search-input"
+                value="{{ request('search') }}"
+                placeholder="Search deleted contacts..."
+                class="search-input">
+        </form>
+    </div>
+    
+    @if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
-    <div class="table-wrapper">
+    @if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
 
-        @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
+    @if($errors->has('restore'))
+    <div class="alert alert-danger">{{ $errors->first('restore') }}</div>
+    @endif
 
-        @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
-
-        @if($errors->has('restore'))
-        <div class="alert alert-danger">{{ $errors->first('restore') }}</div>
-        @endif
-
-
+    <div class="card table-card">
         <table>
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Contact</th>
-                    <th>Actions</th>
+                    <th class="table-header w-1/4">Name</th>
+                    <th class="table-header w-1/4 hidden sm:table-cell">Email</th>
+                    <th class="table-header w-1/4 hidden sm:table-cell">Deleted Date</th>
+                    <th class="table-header w-1/4 text-center">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($contacts as $contact)
-                <tr>
-                    <td>{{ $contact->name }}</td>
-                    <td>{{ $contact->email }}</td>
-                    <td>{{ $contact->contact ?? '-' }}</td>
-                    <td>
-                        <form action="{{ route('contacts.restore', $contact->id) }}" method="POST" onsubmit="return confirm('Restore this contact?')">
+                <tr class="table-row">
+                    <td class="table-cell font-medium">{{ $contact->name }}</td>
+                    <td class="table-cell hidden sm:table-cell text-sm text-gray-600">{{ $contact->email }}</td>
+                    <td class="table-cell hidden sm:table-cell text-sm text-gray-600">
+                        {{ \Carbon\Carbon::parse($contact->deleted_at)->format('d/m/Y H:i') }}
+                    </td>
+                    <td class="table-cell actions-cell">
+                        
+                        <form action="{{ route('contacts.restore', $contact->id) }}" method="POST" class="inline-form">
                             @csrf
                             @method('PATCH')
-                            <button type="submit" class="btn-restore">Restore</button>
+                            <button type="submit" class="btn-success-small">Restore</button>
                         </form>
-                        <form action="{{ route('contacts.wipe', $contact) }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this contact?')" style="display:inline;">
+                        
+                        <form action="{{ route('contacts.wipe', $contact) }}" method="POST" class="inline-form">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn-wipe">Wipe</button>
+                            <button type="submit" class="btn-danger-small">Wipe</button>
                         </form>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="4" class="text-center">No deleted contacts found.</td>
+                    <td colspan="4" class="text-center py-4 text-gray-500">No deleted contacts found.</td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 
-    <div class="pagination-container">
+    <div class="pagination-container mt-6">
         {{ $contacts->links() }}
     </div>
 </div>
@@ -78,168 +82,187 @@
         clearTimeout(timer);
         timer = setTimeout(() => {
             document.getElementById('search-form').submit();
-        }, 300); // debounce 300ms
+        }, 300); 
     });
 </script>
 
 
 <style>
-    .container {
+    .minimal-container {
         max-width: 960px;
         margin: 0 auto;
-        padding: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .title {
+        font-size: 1.6rem;
+        font-weight: 600; 
+        color: #333;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #eee; 
+        padding-bottom: 0.5rem;
     }
 
+    .header-actions-trashed {
+        display: flex;
+        justify-content: flex-end; 
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .search-form {
+        max-width: 300px;
+    }
+    
     .search-input {
-        padding: 0.4rem 0.6rem;
-        font-size: 0.85rem;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        width: 200px;
+        width: 100%;
+        border: 1px solid #ccc; 
+        padding: 0.6rem 0.75rem;
+        border-radius: 4px;
+        background: #fff;
+        font-size: 0.95rem;
+        transition: border-color 0.2s;
+    }
+    
+    .search-input:focus {
+        border-color: #3b82f6; 
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+    
+    .card {
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 0; 
+        background: #ffffff; 
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
+    }
+    
+    .table-card {
+        overflow-x: auto; 
+        padding: 1px; 
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 1rem;
     }
 
-    thead th {
+    .table-header {
         text-align: left;
-        padding: 0.5rem;
-        font-size: 0.85rem;
-        border-bottom: 1px solid #ccc;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: #555;
+        background: #f8f8f8;
+        border-bottom: 2px solid #e0e0e0;
+        font-weight: 600;
+    }
+    
+    .table-header:first-child {
+        border-top-left-radius: 6px;
+    }
+    
+    .table-header:last-child {
+        border-top-right-radius: 6px;
+    }
+    
+    .table-row {
+        transition: background-color 0.2s;
     }
 
-    tbody td {
-        padding: 0.5rem;
-        border-bottom: 1px solid #eee;
-        font-size: 0.9rem;
+    .table-row:hover {
+        background: #fdfdfd; 
+    }
+    
+    .table-cell {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        color: #333;
     }
 
-    tbody tr:last-child td {
+    .table-row:last-child .table-cell {
         border-bottom: none;
     }
 
-    h1 {
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin-bottom: 1rem;
-    }
-
-    .btn-create {
-        padding: 0.4rem 0.7rem;
-        border: 1px solid #333;
-        border-radius: 3px;
-        font-size: 0.85rem;
-        text-decoration: none;
-        color: #000;
-        background: #fff;
-    }
-
-    .btn-create:hover {
-        background: #f2f2f2;
-    }
-
-    .pagination {
+    .actions-cell {
         display: flex;
         justify-content: center;
-        list-style: none;
-        padding: 0;
-        margin-top: 1rem;
-    }
-
-    .pagination li {
-        margin: 0 0.25rem;
-    }
-
-    .pagination a,
-    .pagination span {
-        display: block;
-        padding: 0.4rem 0.6rem;
-        text-decoration: none;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        font-size: 0.85rem;
-    }
-
-    td.actions {
-        display: flex;
-        gap: 0.4rem;
         align-items: center;
+        gap: 0.5rem;
     }
-
-    td.actions form {
+    
+    .inline-form {
+        display: inline-block;
         margin: 0;
     }
 
-    .btn-show,
-    .btn-restore {
-        display: inline-block;
-        padding: 0.3rem 0.5rem;
+    .btn-success-small,
+    .btn-danger-small {
+        padding: 0.4rem 0.9rem;
+        border-radius: 4px;
         font-size: 0.8rem;
-        border: 1px solid #333;
-        border-radius: 3px;
         text-decoration: none;
-        color: #000;
-        background: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+        white-space: nowrap;
     }
 
-    .btn-show:hover {
-        background: #f2f2f2;
+    .btn-success-small {
+        border: 1px solid #10b981; 
+        background: #10b981; 
+        color: #fff;
     }
-
-    .btn-show button {
-        all: unset;
-        cursor: pointer;
-        display: inline-block;
-        width: 100%;
-        text-align: center;
+    .btn-success-small:hover {
+        background: #059669;
+        border-color: #059669;
     }
-
-    .btn-restore {
-        border-color: #28a745;
-        color: #155724;
-        background: #d4edda;
+    
+    .btn-danger-small {
+        border: 1px solid #ef4444; 
+        background: #ef4444; 
+        color: #fff;
     }
-
-    .btn-restore:hover {
-        background: #c3e6cb;
+    .btn-danger-small:hover {
+        background: #dc2626;
+        border-color: #dc2626;
     }
-
-    .btn-wipe {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.85rem;
-        border: 1px solid #d9534f;
-        border-radius: 3px;
-        background: #fbeaea;
-        color: #c0392b;
-        cursor: pointer;
-        transition: background 0.2s ease;
-    }
-
-    .btn-wipe:hover {
-        background: #f5c6c6;
-    }
-
+    
     .alert {
-        padding: 0.5rem 0.75rem;
+        padding: 0.75rem 1rem;
         margin-bottom: 1rem;
-        border-radius: 3px;
+        border-radius: 4px;
         font-size: 0.9rem;
+        border: 1px solid transparent;
     }
 
     .alert-success {
-        background-color: #d4edda;
-        color: #155724;
-        border: 1px solid #28a745;
+        background-color: #d1e7dd;
+        color: #0f5132;
+        border-color: #badbcc;
     }
 
     .alert-danger {
         background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #c0392b;
+        color: #842029;
+        border-color: #f5c2c7;
+    }
+    
+    @media (max-width: 640px) {
+        .table-header, .table-cell {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        .actions-cell {
+            flex-direction: column;
+            gap: 0.25rem;
+            align-items: flex-start;
+        }
     }
 </style>
 @endsection
