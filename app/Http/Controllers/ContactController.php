@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateContactRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\RestoreContactRequest;
+use Illuminate\Support\Facades\Log; 
 
 class ContactController extends Controller
 {
@@ -19,20 +20,25 @@ class ContactController extends Controller
     {
         $search = $request->input('search');
 
-        $contacts = Contact::query()
-            ->when($search, function ($q) use ($search) {
-                $q->where(function ($sub) use ($search) {
-                    $sub->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%")
-                        ->orWhere('contact', 'like', "%{$search}%");
-                });
-            })
-            ->whereNull('deleted_at')
-            ->orderByDesc('created_at')
-            ->paginate(10)
-            ->appends(['search' => $search]);
+        try {
+            $contacts = Contact::query()
+                ->when($search, function ($q) use ($search) {
+                    $q->where(function ($sub) use ($search) {
+                        $sub->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('contact', 'like', "%{$search}%");
+                    });
+                })
+                ->whereNull('deleted_at')
+                ->orderByDesc('created_at')
+                ->paginate(10)
+                ->appends(['search' => $search]);
 
-        return view('contacts.index', compact('contacts'));
+            return view('contacts.index', compact('contacts'));
+        } catch (\Throwable $e) {
+            Log::error("Error listing contacts in index(): " . $e->getMessage(), ['exception' => $e]);
+            return redirect()->route('contacts.index')->with('error', 'An error occurred while loading the contact list.');
+        }
     }
 
 
@@ -60,6 +66,7 @@ class ContactController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * Validation is automatically handled by StoreContactRequest.
      */
     public function store(StoreContactRequest $request): RedirectResponse
     {
@@ -70,10 +77,14 @@ class ContactController extends Controller
 
             DB::commit();
 
-            return redirect()->route('contacts.show', $contact);
+            return redirect()->route('contacts.show', $contact)
+                ->with('success', 'Contact created successfully.');
         } catch (\Throwable $e) {
             DB::rollBack();
-            throw $e;
+            Log::error("Error creating contact: " . $e->getMessage(), ['request' => $request->all(), 'exception' => $e]);
+            return redirect()->route('contacts.create')
+                ->with('error', 'Failed to create contact due to a server error.')
+                ->withInput();
         }
     }
 
@@ -88,8 +99,8 @@ class ContactController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * Validation is automatically handled by UpdateContactRequest.
      */
-
     public function update(UpdateContactRequest $request, Contact $contact): RedirectResponse
     {
         DB::beginTransaction();
@@ -99,15 +110,19 @@ class ContactController extends Controller
 
             DB::commit();
 
-            return redirect()->route('contacts.show', $contact);
+            return redirect()->route('contacts.show', $contact)
+                ->with('success', 'Contact updated successfully.');
         } catch (\Throwable $e) {
             DB::rollBack();
-            throw $e;
+            Log::error("Error updating contact ID: {$contact->id}: " . $e->getMessage(), ['request' => $request->all(), 'exception' => $e]);
+            return redirect()->route('contacts.edit', $contact)
+                ->with('error', 'Failed to update contact due to a server error.')
+                ->withInput();
         }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage (soft delete).
      */
     public function destroy(Contact $contact): RedirectResponse
     {
@@ -121,6 +136,7 @@ class ContactController extends Controller
                 ->with('success', 'Contact deleted successfully.');
         } catch (\Throwable $e) {
             DB::rollBack();
+            Log::error("Error deleting contact ID: {$contact->id}: " . $e->getMessage(), ['exception' => $e]);
             return redirect()->route('contacts.index')
                 ->with('error', 'Failed to delete contact.');
         }
@@ -129,20 +145,23 @@ class ContactController extends Controller
 
     /**
      * Restore a soft-deleted contact.
+     * ID validation is automatically handled by RestoreContactRequest.
      */
-    public function restore(RestoreContactRequest $request, int $contact): RedirectResponse
+    public function restore(RestoreContactRequest $request, int $contactId): RedirectResponse
     {
-        $contact = Contact::withTrashed()->findOrFail($contact);
-
+        $contact = Contact::withTrashed()->findOrFail($contactId);
         DB::beginTransaction();
         try {
             $contact->restore();
             DB::commit();
 
+            Log::info("Contact ID: {$request->contact} restored successfully.");
+
             return redirect()->route('contacts.index')
                 ->with('success', 'Contact restored successfully.');
         } catch (\Throwable $e) {
             DB::rollBack();
+            Log::error("Error restoring contact ID: {$contact->id}" . $e->getMessage(), ['exception' => $e]);
             return redirect()->route('contacts.trashed')
                 ->with('error', 'Failed to restore contact.');
         }
@@ -152,19 +171,24 @@ class ContactController extends Controller
     {
         $search = $request->input('search');
 
-        $contacts = Contact::onlyTrashed()
-            ->when($search, function ($q) use ($search) {
-                $q->where(function ($sub) use ($search) {
-                    $sub->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%")
-                        ->orWhere('contact', 'like', "%{$search}%");
-                });
-            })
-            ->orderByDesc('deleted_at')
-            ->paginate(10)
-            ->appends(['search' => $search]);
+        try {
+            $contacts = Contact::onlyTrashed()
+                ->when($search, function ($q) use ($search) {
+                    $q->where(function ($sub) use ($search) {
+                        $sub->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('contact', 'like', "%{$search}%");
+                    });
+                })
+                ->orderByDesc('deleted_at')
+                ->paginate(10)
+                ->appends(['search' => $search]);
 
-        return view('contacts.trashed', compact('contacts'));
+            return view('contacts.trashed', compact('contacts'));
+        } catch (\Throwable $e) {
+            Log::error("Error listing trashed contacts in trashed(): " . $e->getMessage(), ['exception' => $e]);
+            return redirect()->route('contacts.index')->with('error', 'An error occurred while loading the trash list.');
+        }
     }
 
 
@@ -181,11 +205,12 @@ class ContactController extends Controller
             $contact->forceDelete();
             DB::commit();
 
-            return redirect()->route('contacts.index')
+            return redirect()->route('contacts.trashed')
                 ->with('success', 'Contact permanently deleted.');
         } catch (\Throwable $e) {
             DB::rollBack();
-            return redirect()->route('contacts.index')
+            Log::error("Error permanently wiping contact ID: {$contact->id}: " . $e->getMessage(), ['exception' => $e]);
+            return redirect()->route('contacts.trashed')
                 ->with('error', 'Failed to permanently delete contact.');
         }
     }
