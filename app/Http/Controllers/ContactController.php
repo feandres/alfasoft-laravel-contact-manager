@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Contact;
 use Illuminate\Http\Request;
 
+
 class ContactController extends Controller
 {
     /**
@@ -12,9 +13,14 @@ class ContactController extends Controller
      */
     public function index()
     {
-        //
+        $contacts = Contact::orderByDesc('created_at')->paginate(10);
+
+        return view('contacts.index', [
+            'contacts' => $contacts,
+        ]);
     }
 
+    
     /**
      * Show the form for creating a new resource.
      */

@@ -1,3 +1,43 @@
+@extends('layout.layout')
+
+@section('title', 'Contacts')
+
+@section('content')
+
+<div class="container">
+    <h1>Contacts</h1>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($contacts as $contact)
+                <tr>
+                    <td>{{ $contact->name }}</td>
+                    <td>{{ $contact->email }}</td>
+                    <td>{{ $contact->contact ?? '-' }}</td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="3" class="text-center">No contacts found.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination-container">
+        {{ $contacts->links() }}
+    </div>
+</div>
+
+<style>
     .container {
         max-width: 960px;
         margin: 0 auto;
@@ -54,3 +94,5 @@
         border-radius: 3px;
         font-size: 0.85rem;
     }
+</style>
+@endsection
