@@ -7,22 +7,33 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreContactRequest;
 use App\Http\Requests\UpdateContactRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $contacts = Contact::orderByDesc('created_at')
-            ->where('deleted_at', null) // ignore soft-deleted
-            ->paginate(10);
+        $search = $request->input('search');
 
-        return view('contacts.index', [
-            'contacts' => $contacts,
-        ]);
+        $contacts = Contact::query()
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('contact', 'like', "%{$search}%");
+                });
+            })
+            ->whereNull('deleted_at')
+            ->orderByDesc('created_at')
+            ->paginate(10)
+            ->appends(['search' => $search]);
+
+        return view('contacts.index', compact('contacts'));
     }
+
 
     /**
      * Display the specified resource.
@@ -96,7 +107,7 @@ class ContactController extends Controller
         DB::beginTransaction();
 
         try {
-            $contact->delete(); 
+            $contact->delete();
             DB::commit();
 
             return redirect()->route('contacts.index')
@@ -140,7 +151,7 @@ class ContactController extends Controller
         DB::beginTransaction();
 
         try {
-            $contact->forceDelete(); 
+            $contact->forceDelete();
             DB::commit();
 
             return redirect()->route('contacts.index')
